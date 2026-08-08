@@ -1,0 +1,43 @@
+name: GitHub App Integration Test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout github-demo
+        uses: actions/checkout@v4
+
+      - name: Show repository
+        run: |
+          echo "Public repository: $GITHUB_REPOSITORY"
+          echo "Workflow: $GITHUB_WORKFLOW"
+          echo "Commit: $GITHUB_SHA"
+
+      - name: Test GitHub App authentication
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_APP_TOKEN }}
+        run: |
+          echo "Testing GitHub App..."
+
+          gh api /installation/repositories \
+            --jq '.repositories[].full_name'
+
+      - name: Test private repository access
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_APP_TOKEN }}
+        run: |
+          echo "Checking pythonhidden..."
+
+          gh api repos/AbdullahMohsinU/pythonhidden \
+            --jq '.full_name'
+
+      - name: Integration successful
+        run: |
+          echo "GitHub App integration is working properly!"
