@@ -19,15 +19,32 @@ jobs:
           app-id: 4525745
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: AbdullahMohsinU
-          repositories: python-hidden-tests
+          repositories: github_demo_AbdullahMohsin,python-hidden-tests
+
+      - name: Create pending check
+        id: check
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          CHECK_ID=$(gh api \
+            repos/AbdullahMohsinU/github_demo_AbdullahMohsin/check-runs \
+            --method POST \
+            -f name="Private Hidden Tests" \
+            -f head_sha="${{ github.event.pull_request.head.sha }}" \
+            -f status="in_progress" \
+            --jq '.id')
+
+          echo "check_id=$CHECK_ID" >> "$GITHUB_OUTPUT"
 
       - name: Trigger private tests
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          CHECK_ID: ${{ steps.check.outputs.check_id }}
         run: |
           gh api \
             repos/AbdullahMohsinU/python-hidden-tests/dispatches \
             --method POST \
             -f event_type=run-private-tests \
             -f 'client_payload[pr_number]=${{ github.event.pull_request.number }}' \
-            -f 'client_payload[sha]=${{ github.event.pull_request.head.sha }}'
+            -f 'client_payload[sha]=${{ github.event.pull_request.head.sha }}' \
+            -f "client_payload[check_id]=$CHECK_ID"
