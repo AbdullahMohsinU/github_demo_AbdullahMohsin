@@ -7,37 +7,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  integration-test:
+  integration:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout github-demo
         uses: actions/checkout@v4
 
-      - name: Show repository
-        run: |
-          echo "Public repository: $GITHUB_REPOSITORY"
-          echo "Workflow: $GITHUB_WORKFLOW"
-          echo "Commit: $GITHUB_SHA"
-
-      - name: Test GitHub App authentication
+      - name: Check GitHub App access
         env:
           GH_TOKEN: ${{ secrets.GITHUB_APP_TOKEN }}
         run: |
-          echo "Testing GitHub App..."
-
+          echo "Checking GitHub App access..."
           gh api /installation/repositories \
             --jq '.repositories[].full_name'
 
-      - name: Test private repository access
+      - name: Check private repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_APP_TOKEN }}
         run: |
-          echo "Checking pythonhidden..."
-
-          gh api repos/AbdullahMohsinU/pythonhidden \
+          echo "Checking python-hidden-tests..."
+          gh api repos/AbdullahMohsinU/python-hidden-tests \
             --jq '.full_name'
 
       - name: Integration successful
         run: |
-          echo "GitHub App integration is working properly!"
+          echo "GitHub App integration is working!"
