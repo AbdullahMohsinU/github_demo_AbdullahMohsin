@@ -1,0 +1,33 @@
+name: Trigger Private Tests
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 4525745
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: AbdullahMohsinU
+          repositories: python-hidden-tests
+
+      - name: Trigger private test workflow
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api \
+            repos/AbdullahMohsinU/python-hidden-tests/dispatches \
+            --method POST \
+            -f event_type=run-private-tests \
+            -f 'client_payload[pr_number]=${{ github.event.pull_request.number }}' \
+            -f 'client_payload[sha]=${{ github.event.pull_request.head.sha }}'
