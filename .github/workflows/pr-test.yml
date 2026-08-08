@@ -2,8 +2,10 @@ name: Python PR Test
 
 on:
   pull_request:
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -17,6 +19,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Install pytest
+        run: python -m pip install pytest
 
       - name: Check Python file
         run: python -m py_compile addition.py
