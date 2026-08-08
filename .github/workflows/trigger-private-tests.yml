@@ -19,20 +19,7 @@ jobs:
           app-id: 4525745
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: AbdullahMohsinU
-          repositories: github_demo_AbdullahMohsin,python-hidden-tests
-
-      - name: Create pending check
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          gh api \
-            repos/AbdullahMohsinU/github_demo_AbdullahMohsin/check-runs \
-            --method POST \
-            -f name="Private Hidden Tests" \
-            -f head_sha="${{ github.event.pull_request.head.sha }}" \
-            -f status="in_progress" \
-            -f 'output[title]=Private Hidden Tests' \
-            -f 'output[summary]=Waiting for private tests to finish.'
+          repositories: python-hidden-tests
 
       - name: Trigger private tests
         env:
